@@ -1,0 +1,18 @@
+alias: Update Xbox Live Status
+trigger:
+  - platform: state
+    entity_id: sensor.restful_xbox_live_status
+condition:
+  - condition: template
+    value_template: >-
+      {{
+        states("sensor.restful_xbox_live_status") != "unavailable" and
+        states("sensor.restful_xbox_live_status") != "unknown" and
+        states("sensor.restful_xbox_live_status") != None
+      }}
+    
+action:
+  - service: input_text.set_value
+    data_template:
+      entity_id:  input_text.xbox_live_status
+      value: '{{ states("sensor.restful_xbox_live_status") }}'

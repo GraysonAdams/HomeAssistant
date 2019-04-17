@@ -1,0 +1,10 @@
+alias: Notify that food is dispensing
+trigger:
+  - platform: state
+    entity_id: switch.cat_feeder
+    to: 'on'
+action:
+  - service: notify.pushbullet
+    data:
+      title: "Home Assistant"
+      message: "Dispensing food for Lilly."

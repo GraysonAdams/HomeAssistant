@@ -1,0 +1,40 @@
+# default_view:
+#   view: true
+#   icon: mdi:home
+#   entities:
+#     - binary_sensor.apartment_occupied
+#     - group.kitchen
+#     - group.living_room
+#     - group.entrance
+#     - group.graysons_room
+# kitchen:
+#   name: Kitchen
+#   entities:
+#     - binary_sensor.kitchen_occupied
+#     - media_player.kitchen
+#     - light.kitchen_ceiling
+# living_room:
+#   name: Living Room
+#   entities:
+#     - binary_sensor.living_room_occupied
+#     - sensor.xbox_live_status
+#     - sensor.xbox_live_game
+#     - media_player.living_room
+#     - light.living_room_ceiling
+#     - light.tv_left
+#     - light.tv_right
+#     - light.hanging_lamp
+#     - light.shelf
+#     - switch.cat_feeder
+#     - camera.living_room
+# entrance:
+#   name: Entrance
+#   entities:
+#     - binary_sensor.entrance_occupied
+#     - light.hallway_ceiling
+# graysons_room:
+#   name: Grayson's Room
+#   entities:
+#     - light.bed_left
+#     - light.bed_right
+#     - switch.bedroom_fan

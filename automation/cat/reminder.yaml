@@ -1,0 +1,13 @@
+alias: Remind me to feed cat
+trigger:
+  - platform: time
+    at: '19:00:00'
+condition:
+  - condition: state
+    entity_id: device_tracker.grayson
+    state: 'home'
+action:
+  - service: notify.pushbullet
+    data:
+      title: "Home Assistant"
+      message: "Time to feed Lilly!"

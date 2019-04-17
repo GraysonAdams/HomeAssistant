@@ -1,0 +1,16 @@
+alias: Turn on Hallway Lights
+trigger:
+  - platform: state
+    entity_id: binary_sensor.entrance_occupied
+    to: 'on'
+action:
+  - service: light.turn_on
+    data_template:
+      entity_id: light.hallway
+      transition: 2
+      brightness_pct: >-
+        {% if now().hour >= 23 or now().hour < 7 %}
+          20
+        {% else %}
+          100
+        {% endif %}

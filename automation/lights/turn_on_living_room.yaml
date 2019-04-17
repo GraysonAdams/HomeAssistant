@@ -1,0 +1,35 @@
+alias: Turn on Living Room lights
+trigger:
+#  - platform: state
+#    entity_id: sensor.xbox_live_game
+#  - platform: state
+#    entity_id: sensor.xbox_live_status
+#    from: 'Offline'
+#    to: 'Online'
+  - platform: state
+    entity_id: binary_sensor.living_room_occupied
+    to: 'on'
+    from: 'off'
+  - platform: sun
+    event: sunset
+    offset: '-00:30:00'
+condition:
+  # - condition: state
+  #   entity_id: sensor.xbox_live_status
+  #   state: 'Online'
+  - condition: or
+    conditions:
+    - condition: sun
+      after: sunset
+      after_offset: '-00:30:00'
+    - condition: sun
+      before: sunrise
+action:
+  - service: light.turn_on
+    data:
+       entity_id: light.living_room
+       brightness_pct: 100
+#  - service: hue.hue_activate_scene
+#    data_template:
+#      group_name: "Living Room"
+#      scene_name: "{{ states('sensor.xbox_live_game') }}"

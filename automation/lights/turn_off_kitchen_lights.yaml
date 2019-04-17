@@ -1,0 +1,10 @@
+alias: Turn off Kitchen Lights
+trigger:
+  - platform: state
+    entity_id: binary_sensor.kitchen_occupied
+    to: 'off'
+action:
+  - service: light.turn_off
+    data:
+      entity_id: light.kitchen
+      transition: 5

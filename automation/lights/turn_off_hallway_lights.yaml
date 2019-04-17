@@ -1,0 +1,10 @@
+alias: Turn off Hallway Lights
+trigger:
+  - platform: state
+    entity_id: binary_sensor.entrance_occupied
+    to: 'off'
+action:
+  - service: light.turn_off
+    data:
+      entity_id: light.hallway
+      transition: 5

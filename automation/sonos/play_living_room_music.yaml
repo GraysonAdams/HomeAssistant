@@ -1,0 +1,63 @@
+alias: Play Living Room Music
+trigger:
+  - platform: state
+    entity_id: binary_sensor.living_room_occupied
+    to: 'on'
+  - platform: state
+    entity_id: sensor.xbox_live_status
+    to: 'Offline'
+    from: 'Online'
+  - platform: state
+    entity_id: media_player.shelf
+    to: 'off'
+    for: 
+      hours: 1
+  - platform: time
+    at: '08:00:00'
+  - platform: time
+    at: '12:00:00'
+  - platform: time
+    at: '18:00:00'
+  - platform: time
+    at: '23:00:00'
+condition:
+  - condition: template
+    value_template: '{{ states("sensor.xbox_live_status") == "Offline" }}'
+  - condition: state
+    entity_id: binary_sensor.living_room_occupied
+    state: 'on'
+action:
+  - service: media_player.volume_set
+    data_template:
+      entity_id: media_player.shelf, media_player.living_room
+      volume_level: >-
+        {% if now().hour >= 23 or now().hour < 7 %}
+            0.1
+        {% elif now().hour >= 18 %}
+            0.2
+        {% elif now().hour >= 10 %}
+            0.2
+        {% elif now().hour >= 8 %}
+            0.1
+        {% endif %}
+  - service: media_player.select_source
+    data_template:
+      entity_id: media_player.shelf
+      source: >-
+        {% if now().hour >= 23 or now().hour < 7 %}
+            {{
+              ["San Francisco Symphony", "Classical", "New Age Solo Piano", "Autumn Jazz", "Classical Solo Piano", "Symphonic", "Smooth Jazz", "Piano Music"] | random
+            }} Radio
+        {% elif now().hour >= 18 %}
+            {{
+              ["John Mayer", "Hozier", "Young the Giant", "The xx", "Norah Jones", "The Paper Kites", "Chill Out Radio", "Chill House", "Jack Johnson", "Deep House", "Sam Smith", "Stay With Me", "Passenger", "Ben Howard", "Dave Matthews", "When A Fire Starts To Burn", "Eagles", "Down To The Waterline"] | random
+            }} Radio
+        {% elif now().hour >= 10 %}
+            {{
+              ["John Mayer", "DJ Snake", "J. Cole", "Kanye West", "The Lumineers", "Travis Scott", "Bruno Mars", "Metallica", "Pink Floyd", "The Black Keys", "Today's Hits", "Today's Hip Hop and Pop Hits", "Breaking Benjamin", "No Doubt", "Coldplay", "Justin Timberlake", "Ed Sheeran", "Classic Rock", "Maroon 5", "Foster The People"] | random
+            }} Radio
+        {% elif now().hour >= 8 %}
+            {{
+              ["The Lumineers", "Ed Sheeran"] | random
+            }} Radio
+        {% endif %}

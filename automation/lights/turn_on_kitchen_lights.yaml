@@ -1,0 +1,31 @@
+alias: Turn on Kitchen Lights
+trigger:
+  - platform: state
+    entity_id: binary_sensor.kitchen_occupied
+    to: 'on'
+condition:
+  # - condition: or
+  #   conditions:
+  #     - condition: state
+  #       entity_id: sensor.xbox_live_status
+  #       state: 'Offline'
+  #     - condition: template
+  #       value_template: "{{ states('sensor.xbox_live_game') == 'Home' }}"
+  - condition: or
+    conditions:
+      - condition: sun
+        after: sunset
+        after_offset: '-00:30:00'
+      - condition: sun
+        before: sunrise
+action:
+  - service: light.turn_on
+    data_template:
+      entity_id: light.kitchen
+      transition: 2
+      brightness_pct: 100
+        # {% if now().hour >= 23 or now().hour < 7 %}
+        #   50
+        # {% else %}
+        #   100
+        # {% endif %}

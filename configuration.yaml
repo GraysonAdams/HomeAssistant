@@ -1,0 +1,203 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 320
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/New_York
+  # Customization file
+  customize: !include customize.yaml
+  whitelist_external_dirs:
+    # - /share/camera
+    - /config/www
+  auth_providers:
+   - type: homeassistant
+
+zone:
+  - name: Home
+    latitude: !secret latitude
+    longitude: !secret longitude
+    radius: 70
+
+system_health:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+recorder:
+  purge_keep_days: 2
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+geofency:
+
+camera:
+  - platform: generic
+    still_image_url: http://192.168.1.110/dms?nowprofileid=1&0.5352780153803472
+    name: 'Living Room'
+    username: 'admin'
+    password: !secret camera_password
+    authentication: basic
+    framerate: 2
+
+  
+# Sensors
+sensor:
+  # Weather prediction
+  - platform: yr
+    monitored_conditions:
+      - cloudiness
+  - platform: rest
+    resource: !secret xbox_live_api_url
+    name: Restful Xbox Live Status
+    headers:
+      X-AUTH: !secret xbox_live_api_key
+    value_template: '{{ value_json.state|default("Offline", true) }}'
+    scan_interval: 60
+  - platform: template
+    sensors:
+      xbox_live_status:
+          friendly_name: "Xbox Live Status"
+          value_template: "{{ states('input_text.xbox_live_status') }}"
+          
+notify:
+  - name: Pushbullet
+    platform: pushbullet
+    api_key: !secret pushbullet_api_key
+
+input_text:
+  xbox_live_status:
+    name: Xbox Live Status
+    initial: ""
+
+binary_sensor:
+  - platform: template
+    sensors:
+      living_room_recent_motion:
+          friendly_name: "Living Room Recent Motion"
+          device_class: "motion"
+          value_template: "{{ states.binary_sensor.living_room_motion_sensor.state == 'on' }}"
+          delay_off:
+            minutes: 35
+      entrance_occupied:
+          friendly_name: "Entrance Occupied"
+          device_class: "occupancy"
+          value_template: "{{ states.binary_sensor.motion_entrance.state == 'on' }}"
+          delay_off:
+            minutes: 3
+      kitchen_occupied:
+          friendly_name: "Kitchen Occupied"
+          device_class: "occupancy"
+          value_template: "{{ states.binary_sensor.motion_kitchen.state == 'on' }}"
+          delay_off:
+            minutes: 3
+      living_room_occupied:
+          friendly_name: "Living Room Occupied"
+          device_class: "occupancy"
+          value_template: >-
+            {{
+              states.binary_sensor.living_room_recent_motion.state == 'on'
+              or
+              states.sensor.xbox_live_status.state == 'Online'
+            }}
+      apartment_occupied:
+          friendly_name: "Apartment Occupied"
+          device_class: "occupancy"
+          value_template: >-
+            {{
+              states.binary_sensor.living_room_occupied.state == 'on'
+              or
+              states.binary_sensor.entrance_occupied.state == 'on'
+              or
+              states.binary_sensor.kitchen_occupied.state == 'on'
+            }}
+  - platform: huesensor
+
+# Text to speech
+tts:
+  - platform: google
+    cache: true
+    cache_dir: /config/tts
+    time_memory: 300
+    language: 'en-us'
+
+# Cloud
+cloud:
+  alexa:
+    filter:
+      include_entities:
+        - script.romance_music
+        - switch.bedroom_fan
+        - switch.cat_feeder
+    entity_config:
+      switch.string_lights:
+          display_categories: LIGHT
+  google_actions:
+    filter:
+      include_entities:
+        - switch.bedroom_fan
+        - switch.cat_feeder
+
+light:
+  - platform: group
+    name: Kitchen Ceiling
+    entities:
+      - light.kitchen_ceiling_1
+      - light.kitchen_ceiling_2
+  - platform: group
+    name: Hallway Ceiling
+    entities:
+      - light.hallway_ceiling_1
+      - light.hallway_ceiling_2
+      - light.hallway_ceiling_3
+  - platform: group
+    name: Living Room Ceiling
+    entities:
+      - light.living_room_ceiling_1
+      - light.living_room_ceiling_2
+
+tplink:
+  discovery: false
+  switch:
+    - host: 192.168.1.101
+
+wemo:
+  discovery: true
+
+group: !include groups.yaml
+automation: !include_dir_list automation/
+script: !include scripts.yaml
+secrets: !include secrets.yaml

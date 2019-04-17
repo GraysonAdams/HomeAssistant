@@ -1,0 +1,30 @@
+alias: Pause Living Room Music
+trigger:
+  - platform: state
+    entity_id: sensor.xbox_live_status
+    to: 'Online'
+    from: 'Offline'
+  - platform: state
+    entity_id: binary_sensor.living_room_occupied
+    to: 'off'
+  - platform: state
+    entity_id: 
+      - media_player.googlehome6838
+      - media_player.googlehomehub0411
+      - media_player.grayson_s_room_tv
+    to: 'playing'
+  - platform: state
+    entity_id: binary_sensor.living_room_occupied
+    to: 'off'
+condition:
+  - condition: or
+    conditions:
+      - condition: time
+        before: '23:00:00'
+        after: '07:00:00'
+      - condition: state
+        entity_id: binary_sensor.living_room_tv
+        state: 'on'
+action:
+  - service: media_player.media_pause
+    entity_id: media_player.shelf

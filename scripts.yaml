@@ -1,0 +1,64 @@
+camera_cat:
+  alias: Take pictures of cat food
+  sequence:
+    - service: camera.snapshot
+      data:
+        entity_id: camera.living_room
+        filename: /config/www/snapshot.jpg
+    - service: notify.pushbullet
+      data:
+        title: "Home Assistant"
+        message: "Food should be dispensed."
+        data:
+          file_url: !secret snapshot1
+    - delay:
+        minutes: 30
+    - service: camera.snapshot
+      data:
+        entity_id: camera.living_room
+        filename: /config/www/snapshot2.jpg
+    - service: notify.pushbullet
+      data:
+        title: "Home Assistant"
+        message: "Did Lilly eat her food?"
+        data:
+          file_url: !secret snapshot2
+
+feed_cat:
+  alias: Feed cat
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.cat_feeder
+    - service: switch.turn_on
+      entity_id: switch.cat_feeder
+    - delay:
+        seconds: 30
+    - service: switch.turn_off
+      entity_id: switch.cat_feeder
+    - service: script.turn_on
+      entity_id: script.camera_cat
+
+romance_music:
+  alias: Romance music
+  sequence:
+    - service: media_player.volume_set
+      data_template:
+        entity_id: media_player.living_room, media_player.kitchen
+        volume_level: 0.5
+    - service: media_player.shuffle_set
+      data_template:
+        entity_id: media_player.living_room, media_player.kitchen
+        shuffle: true
+    - service: media_player.select_source
+      data_template:
+        entity_id: media_player.kitchen
+        source: Romance Music
+        
+fade_in_graysons_lights:
+  alias: "Fade in Grayson's Lights"
+  sequence:
+    - service: light.turn_on
+      data:
+        entity_id: light.graysons_room
+        transition: 300
+        brightness_pct: 100
